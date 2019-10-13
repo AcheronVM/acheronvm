@@ -262,6 +262,7 @@ If `.X` needs to be repurposed inside an instruction implementation, it should b
 The `OP` macro labels a location in the source code where the named instruction implementation begins.
 
     OP <name>, <operands>, <category>, <html doc>
+
 This macro does not create any bytes in the code stream where it resides, but places all its generated information into separate ca65 segments, which allows instructions to flow into another's implementation without issue:
 ```
 OP incp2, none, regs, "rP := rP + 2"
@@ -274,17 +275,20 @@ OP incp, none, regs, "rP := rP + 1"
   inc 1,x
 :jmp mainLoop0
 ```
+
+The OP usage site also gains the label `op_<name>`, in case such a chaining needs to jump to it.
+
 ## Operand Encoding
 The 2nd field of the `OP` macro defines what operand parameters the instruction takes, and how they're ordered and encoded. These options are defined in `operand-encodings.inc`, and can be extended.
 
-Register operands should be stored pre-shifted (`r0` encodes to 0; `r1` to 2; `r2` to 4, etc). Options to offset values by 1, calculate relative branch offsets from the current PC to a label, and other conveniences are included
+Register operands are stored pre-shifted (`r0` encodes to 0; `r1` to 2; `r2` to 4, etc). Options to offset values by 1, calculate relative branch offsets from the current PC to a label, and other conveniences are included.
 
 `rA` names an auxiliary register which will be referenced, while `rD` names a destination register that is intended to be come the new `rP`, meaning `.X` will be updated to point to it. These are naming conventions and must be implemented in code to match the documentation.
 
 ## Reading Operand Bytes
 On instruction entry `lda (iptr),y` accesses the first operand byte. The `.Y` register may be freely incremented without bounds checking, up to a maximum instruction length of 128 bytes. The last read does not have to increment `.Y` if it jumps to `mainLoop1`.
 
-When reading register values, the offset is stored in the operand byte, but this must be added to `rptr`. The convenience macros `get_ra` and `get_ra_y` perform this operation, requiring that carry was clear on entry, and assuming carry stays clear as long as the register number is sane and does not wrap past address $ff.
+When reading register values, the offset is stored in the operand byte, but this must be added to `rptr`. The convenience macros `get_ra` and `get_ra_y` perform this operation, requiring that carry was clear on entry, and assuming carry stays clear as long as the register number is sane and does not wrap past address $ff. The macro `get_rd` reads a register address and places it in .X, effectively realiasing `rP`.
 
 ## Examples
 *Note that while some of these mimic standard instructions, the actual source code shares implementation bodies between instructions and is not verbatim here.*
@@ -342,7 +346,7 @@ OP copyri, imm8ra, regs, "rP := rA + imm8"
  jmp mainLoopRestoreY ; .Y was pointing to the last byte when it was saved
 ```
 #### Carry Stack Example
-We can create custom a instruction to test if any bits are set in the carry stack. This little self-contained block of code is all that's required to define & document it:
+We can create a custom instruction to test if any bits are set in the carry stack. This little self-contained block of code is all that's required to define & document it:
 ```
 OP bcstack, rel8, flow, "Branch if any bit in the carry stack is set."
  lda cstack
