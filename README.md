@@ -163,7 +163,7 @@ First, the VM itself must be built, via `make acheron`. A critical output of thi
 
 Second, the user code is built. This includes `acheron.inc`, which enables the new instruction syntax.  This code is directly linked against the `.o` files from the first step, in order to resolve any labels from the VM, at the very least the one for `jsr acheron`. The included `make test` target performs this linking build with the `test.asm` file, appending its code to the same memory segment as the AcheronVM runtime.
 
-## Custom  Configuration
+## Custom Configuration
 
 `src/acheron.cfg` specifies the memory layout, and should be adjusted or ported per project. The ZPSTACK, ZPTEMP, and ACHERON memory areas define the locations of all the memory used. Everything else is for creating the necessary output files.
 
