@@ -28,7 +28,7 @@ OP decloopi, imm8rel8neg, flow, "Decrements rP by imm8, looping back imm8 bytes 
  sta 0,x
  lda 1,x
  sbc #0
- sta 0,x
+ sta 1,x
  bcs :--
  jmp mainLoop1
 

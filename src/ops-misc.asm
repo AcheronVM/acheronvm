@@ -112,8 +112,8 @@ OP andr, ra, bits, "rP := rP & rA"
  and 0,y
  sta 0,x
  lda 1,x
- and 0,y
- sta 0,x
+ and 1,y
+ sta 1,x
  jmp mainLoopRestoreY
 
 OP orr, ra, bits, "rP := rP | rA"
