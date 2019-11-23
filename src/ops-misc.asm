@@ -62,13 +62,13 @@ OP shrink, pslots, regs, "Shrink the register stack by imm8 slots.  The resultin
 
 
 OP bswap, none, bits, "Swap high and low bytes of rP."
- dey
- save_y
- ldy 0,x
+ lda 0,x
+ pha
  lda 1,x
  sta 0,x
- sty 1,x
- jmp mainLoopRestoreY
+ pla
+ sta 1,x
+ jmp mainLoop0
 
 
 

@@ -69,35 +69,35 @@ PSEUDO case, "imm, rel8", flow, "Becomes case8 or case16", {" .if (imm >= 0) .an
 OP case8, imm8rel8, flow, "Branch if rP = imm8."
  lda (iptr),y     ; test low byte
  iny              ; prepare .Y for ba to read the rel8 byte
- cmp 0,x
+ eor 0,x
  bne mainLoop1
  lda 1,x          ; fail if high byte of rP is nonzero
- beq ba_clc
+ beq op_ba
  jmp mainLoop1
 
 OP case16, imm16rel8, flow, "Branch if rP = imm16."
  lda (iptr),y     ; test low byte
  iny
- cmp 0,x
+ eor 0,x
  bne :+
  lda (iptr),y     ; test high byte
- cmp 1,x
- beq ba_clc
-:jmp mainLoop1
+ iny
+ eor 1,x
+ beq op_ba
+:jmp mainLoop0
 
 OP caser, rarel8, flow, "Branch if rP = rA"
  get_ra
  iny
  tay_save
- lda 0,x
- cmp 0,y
- bne :-   ;; TODO - where is this supposed to go?
- lda 1,x
- cmp 1,y
- bne :-
- ldy iptr_offset
- jmp ba_clc
-
+ lda 0,y
+ eor 0,x
+ bne :+
+ lda 1,y
+ ldy iptr_offset  ; manually restore .Y as soon as possible, so we can branch out
+ eor 1,x
+ beq op_ba
+:jmp mainLoop0
  
  ;; Negative cases are of dubious utility for branch trees, as it would be a bunch of expensive taken branches in the common case
 .if 0

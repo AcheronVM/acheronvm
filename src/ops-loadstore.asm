@@ -78,6 +78,7 @@ OP stm, ra, mem, "memory(rA) := rP."
  ;  Maybe the FAST_MEMOPS could do it that way or something
 :sta zptemp
  php   ; save the carry flag for post-get_ra
+ clc
  get_ra
  sta :+ + 1
  sta :++ + 1
@@ -197,6 +198,7 @@ OP ldm, rd, mem, "rD := memory(rP)"
  stx :++ +1
  sta zptemp
  php
+ clc
  get_rd  ; rD becomes the new rP pretty quickly, to receive the data
  save_y
  ldy zptemp
@@ -218,7 +220,7 @@ OP ldm, rd, mem, "rD := memory(rP)"
 
 ;; 16-bit wide versions are combined, as 8-bit versions can be made really short
 OP derefi, imm8, mem, "rP := memory(rP + imm8)"
- lda (0),y
+ lda (iptr),y
  iny
  bne :+
 OP deref, none, mem, "rP := memory(rP)"
@@ -397,6 +399,7 @@ OP ldmr, rdra, mem, "rD := memory(rP + rA). Load Memory, Register indexed."
  sec
 OP ldmbr, rdra, mem, "rD := memory(rP + rA) byte.  Load Memory Byte, Register indexed."
  php
+ clc
  ; Put the destination register into zptemp
  get_ra
  sta zptemp+2
@@ -415,15 +418,13 @@ OP ldmbr, rdra, mem, "rD := memory(rP + rA) byte.  Load Memory Byte, Register in
  ldx zptemp+2
  sta 0,x
  plp
- bcc :+
-  ; Byte version
-  sty 1,x ; clear the high byte
-  bcs :++
+ bcs :+
   ; Word version
-: iny
+  iny
   lda (zptemp),y
-  sta 1,x 
-:jmp mainLoopRestoreY
+  tay
+:sty 1,x
+ jmp mainLoopRestoreY
 
 OP stmr, rdra, mem, "memory(rD + rA) := rP.  Store Memory, Register indexed."
  ; Save the high byte to store
@@ -432,6 +433,7 @@ OP stmr, rdra, mem, "memory(rD + rA) := rP.  Store Memory, Register indexed."
  sec
 OP stmbr, rdra, mem, "memory(rD + rA) byte := rP.  Store Memory Byte, Register indexed."
  php
+ clc
  ; Save the byte to store, from the current rP
  lda 0,x
  sta zptemp+2

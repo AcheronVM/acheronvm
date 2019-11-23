@@ -34,11 +34,6 @@ OP jump, imm16, flow, "Jump to imm16."
  ldy #0
  jmp mainLoop0 ; 47 clock cycles
 
- sta iptr
- sty iptr+1
- ldy #0
- jmp mainLoop0
-
 .export op_ret, op_retm
 OP retm, none, flow, "Pop & restore the register stack mark from mgrow, return from subroutine.  Resets rP to the returned r0."
  pla

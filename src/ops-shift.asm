@@ -54,12 +54,15 @@ OP addea2, ra, bits, "rP := rP + (rA << 1).  Does not affect carry."
  get_ra_y
  lda 0,y
  asl
- bcc :+
-  inc 1,x
-  clc
-:adc 0,x
- sta 0,x
+ sta zptemp
  lda 1,y
+ rol
+ tay
+ lda zptemp
+ clc
+ adc 0,x
+ sta 0,x
+ tya
  adc 1,x
  sta 1,x
  jmp mainLoopRestoreY
