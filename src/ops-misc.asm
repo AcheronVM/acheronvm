@@ -212,10 +212,9 @@ OP fromhex, none, bits, "Convert rP from a 2-byte ASCII hex representation into 
 
 OP signx, none, bits, "Sign extend an 8-bit value in rP into 16 bits."
  lda 0,x
+ and #$80   ; clear out the low 7 bits, will be $00 if it was positive
  bpl :+
- lda #$ff
- bmi :++
-:lda #0
+  lda #$ff  ; nope, it was negative
 :sta 1,x
  jmp mainLoop0
 
