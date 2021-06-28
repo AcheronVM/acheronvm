@@ -33,13 +33,6 @@ ZPVAR rptr, regs, 1, "Pointer to the head of the register stack, which is also r
 ZPVAR pptr, regs, 1, "Pointer to the prior register, rP."
 
 
-.macro reportSize label, filename
- label:
- .include filename
- .ident (.concat("_size__", .string(label))) = * - name
- .export .ident (.concat("_size__", .string(label)))
- .endmacro
- 
 .macro reportSizeSince name
  :
  .ident (.concat("_size__", .string(name))) = :- - name
